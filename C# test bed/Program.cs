@@ -19,7 +19,7 @@ namespace Program
 
 namespace Catalog
 {
-    public static class TestClass
+    public class TestClass
     {
         public static void Test()
         {
@@ -37,16 +37,13 @@ namespace Catalog
         }
     }
     
-    public interface ICatalog<T> : IEnumerable<T>
+    public interface ICatalog<T> : IEnumerable<T>, ICollection<T>
     {
         int Capacity { get; }
-        int Count { get; }
-        bool IsReadOnly { get; }
         void AddRange(IEnumerable<T> Values);
         void RemoveAt(int Index);
         T RemoveAndGet(int Index);
         int IndexOf(T Taarget);
-        bool Contains(T Target);
         T[] ToArray();
         List<T> ToList();
         T GetRandom();
@@ -66,7 +63,7 @@ namespace Catalog
             }
         }
         public bool IsReadOnly { get; }
-        public int TryGetNonEnumeratedCount() => Count;
+
         public Catalog(int Capacity = 0, bool IsReadOnly = false)
         {
             Items = new T[Capacity < 0 ? 0 : Capacity];
@@ -260,24 +257,10 @@ namespace Catalog
             Items.CopyTo(DestinationArray, StartingIndex);
         }
 
-        public static Catalog<T> Combine(Catalog<T> CatalogA, Catalog<T> CatalogB)
+        public T GetRandom()
         {
-            Catalog<T> Result = CatalogA.Clone();
-            Result.AddRange(CatalogB);
-            return Result;
-        }
-
-        public static bool EqualContents(Catalog<T> CatalogA, Catalog<T> CatalogB)
-        {
-            if (CatalogA.Count != CatalogB.Count) return false;
-            for (int i = 0; i < CatalogA.Count; i++)
-            {
-                if (!EqualityComparer<T>.Default.Equals(CatalogA[i], CatalogB[i]))
-                {
-                    return false;
-                }
-            }
-            return true;
+            if (Count == 0) throw new InvalidOperationException($"Catalog<{typeof(T)}> contains no elements.");
+            return Items[Random.Shared.Next(Count)];
         }
 
         public override string ToString()
@@ -323,12 +306,6 @@ namespace Catalog
             return sb.ToString();
         }
 
-        public T GetRandom()
-        {
-            if (Count == 0) throw new InvalidOperationException($"Catalog<{typeof(T)}> contains no elements.");
-            return Items[Random.Shared.Next(Count)];
-        }
-
         public void EnsureMinimumCapacity(int NeededCapacity)
         {
             if (NeededCapacity >= Items.Length)
@@ -346,5 +323,25 @@ namespace Catalog
         }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        public static Catalog<T> Combine(Catalog<T> CatalogA, Catalog<T> CatalogB)
+        {
+            Catalog<T> Result = CatalogA.Clone();
+            Result.AddRange(CatalogB);
+            return Result;
+        }
+
+        public static bool EqualContents(Catalog<T> CatalogA, Catalog<T> CatalogB)
+        {
+            if (CatalogA.Count != CatalogB.Count) return false;
+            for (int i = 0; i < CatalogA.Count; i++)
+            {
+                if (!EqualityComparer<T>.Default.Equals(CatalogA[i], CatalogB[i]))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
     }
 }
