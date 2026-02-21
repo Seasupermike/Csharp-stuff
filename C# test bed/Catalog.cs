@@ -9,7 +9,8 @@ namespace Catalog
     {
         public static void Test()
         {
-
+            Catalog<object?> test = new() { null, '1' };
+            Console.WriteLine(test.ToString());
         }
     }
 
@@ -232,7 +233,6 @@ namespace Catalog
             return new List<T>(this);
         }
 
-        // Makes a copy of the list. If you have objects in the list the copy will have the same refrences.
         public Catalog<T> Clone(bool isReadOnly = false) => new(this, isReadOnly);
 
         public void CopyTo(T[] DestinationArray, int StartingIndex)
@@ -256,7 +256,16 @@ namespace Catalog
                 case "System.String":
                     for (int i = 0; i < Count; i++)
                     {
-                        sb.Append($"\"{Items[i]}\"");
+                        T item = Items[i];
+
+                        if (item is null)
+                        {
+                            sb.Append($"null");
+                        } else
+                        {
+                            sb.Append($"\"{item}\"");
+                        }
+
                         if (i < Count - 1)
                         {
                             sb.Append(", ");
@@ -266,7 +275,16 @@ namespace Catalog
                 case "System.Char":
                     for (int i = 0; i < Count; i++)
                     {
-                        sb.Append($"'{Items[i]}'");
+                        T item = Items[i];
+
+                        if (item is null)
+                        {
+                            sb.Append($"null");
+                        } else
+                        {
+                            sb.Append($"'{Items[i]}'");
+                        }
+                            
                         if (i < Count - 1)
                         {
                             sb.Append(", ");
@@ -276,30 +294,32 @@ namespace Catalog
                 case "System.Object":
                     for (int i = 0; i < Count; i++)
                     {
-                        if (Items[i] is null)
+                        T item = Items[i];
+                        if (item is null)
                         {
                             sb.Append("null");
                             if (i < Count - 1)
                             {
                                 sb.Append(", ");
                             }
-                            break;
+                            continue;
                         }
 
-                        string type = Items[i]!.GetType().ToString();
+                        string type = item!.GetType().ToString();
                         
 
                         if (type == "System.String")
                         {
-                            sb.Append($"\"{Items[i]}\"");
+                            sb.Append($"\"{item}\"");
                         }
                         else if (type == "System.Char")
                         {
-                            sb.Append($"'{Items[i]}'");
+                            sb.Append($"'{item}'");
                         }
                         else
                         {
-                            sb.Append(Items[i]);
+                            sb.Append(item);
+
                         }
 
                         if (i < Count - 1)
@@ -326,9 +346,7 @@ namespace Catalog
                     }
                     break;
             }
-
-            sb.Append(" }");
-            return sb.ToString();
+            return sb.Append(" }").ToString();
         }
 
         public void EnsureMinimumCapacity(int NeededCapacity)
