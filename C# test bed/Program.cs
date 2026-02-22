@@ -1,10 +1,12 @@
-﻿namespace Program
+﻿using System.Numerics;
+
+namespace Program
 {
     internal class Program
     {
         static void Main(string[] args)
         {
-            Math.TestClass.Test();
+            Catalog.TestClass.Test();
         }
     }
 }

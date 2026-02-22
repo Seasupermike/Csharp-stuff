@@ -20,7 +20,7 @@ namespace LinkedList
             Head = new(inital);
         }
 
-        public Link<T> this[int Index]
+        public Link<T>? this[int Index]
         {
             get
             {
@@ -40,7 +40,7 @@ namespace LinkedList
 
         public IEnumerator<T> GetEnumerator()
         {
-            for (Link<T> Current = Head; Current is not null; Current = Current.Next)
+            for (Link<T>? Current = Head; Current is not null; Current = Current.Next)
             {
                 yield return Current.Value;
             }
@@ -57,7 +57,7 @@ namespace LinkedList
 
         public Link(T inital)
         {
-
+            Value = inital;
         }
     }
 }

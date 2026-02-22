@@ -8,7 +8,7 @@ public class Math
 		public static void Test()
 		{
             object?[] nums = [ 'a', 2, "one", false, 1213.78f, true, null];
-            foreach (object num in nums)
+            foreach (object? num in nums)
             {
                 try
                 {
@@ -22,7 +22,7 @@ public class Math
         }
     }
 
-    static bool isEven_Funny(int num)
+    static bool IsEven_Funny(int num)
     {
         if (num < 0)
         {
@@ -39,16 +39,16 @@ public class Math
 
     }
 
-    static bool isEven<T>(T num) where T : INumber<T>
+    static bool IsEven<T>(T num) where T : INumber<T>
     {
         string asString = num.ToString();
-        if (asString.Contains(".")) return false;
+        if (asString.Contains('.')) return false;
         return T.Parse(asString[^1].ToString(), null) % T.Parse("2", null) == T.Parse("0", null);
     }
 
-    static bool isEven(object? value)
+    static bool IsEven(object? value)
     {
-        if (!Information.IsNumeric(value)) return false;
+        if (!Information.IsNumeric(value)) throw new FormatException($"'{value}' is not numeric.");
 
         string asString = value.ToString();
         if (asString.Contains('.')) return false;

@@ -9,8 +9,8 @@ namespace Catalog
     {
         public static void Test()
         {
-            ICatalog<object> test = new Catalog<object>() { '1' };
-            Console.WriteLine(test.ToString());
+            Catalog<int> c = new Catalog<int>() { 1, 2, 3 };
+            int[] l = c.ToArray();
         }
     }
 
@@ -230,14 +230,26 @@ namespace Catalog
 
         public List<T> ToList()
         {
-            return new List<T>(this);
+            List<T> Result = new List<T>(Capacity);
+            foreach (T Item in Items)
+            {
+                Result.Add(Item);
+            }
+            return Result;
         }
 
         public Catalog<T> Clone(bool isReadOnly = false) => new(this, isReadOnly);
 
         public void CopyTo(T[] DestinationArray, int StartingIndex)
         {
-            Items.CopyTo(DestinationArray, StartingIndex);
+            try
+            {
+                Items.CopyTo(DestinationArray, StartingIndex);
+            } catch (Exception e)
+            {
+                throw e;
+            }
+            
         }
 
         public T GetRandom()
