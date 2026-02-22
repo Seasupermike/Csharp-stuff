@@ -4,7 +4,7 @@
     {
         static void Main(string[] args)
         {
-            Catalog.TestClass.Test();
+            Math.TestClass.Test();
         }
     }
 }

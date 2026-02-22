@@ -9,7 +9,7 @@ namespace Catalog
     {
         public static void Test()
         {
-            Catalog<object?> test = new() { null, '1' };
+            ICatalog<object> test = new Catalog<object>() { '1' };
             Console.WriteLine(test.ToString());
         }
     }
@@ -20,7 +20,7 @@ namespace Catalog
         void AddRange(IEnumerable<T> Values);
         void RemoveAt(int Index);
         T RemoveAndGet(int Index);
-        int IndexOf(T Taarget);
+        int IndexOf(T Target);
         T[] ToArray();
         List<T> ToList();
         T GetRandom();
