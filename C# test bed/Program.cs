@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System.Collections.ObjectModel;
+using System.Numerics;
 
 namespace Program
 {
@@ -6,7 +7,7 @@ namespace Program
     {
         static void Main(string[] args)
         {
-            Catalog.TestClass.Test();
+            Result.TestClass.Test();
         }
     }
 }

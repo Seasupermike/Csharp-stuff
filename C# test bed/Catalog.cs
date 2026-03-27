@@ -350,11 +350,11 @@ namespace Catalog
                         {
                             sb.Append(Items[i]!.ToString());
                         }
+
                         if (i < Count - 1)
                         {
                             sb.Append(", ");
                         }
-                        
                     }
                     break;
             }

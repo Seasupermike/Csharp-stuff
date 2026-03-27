@@ -13,36 +13,32 @@ namespace LinkedList
 
     public class LinkedList<T> : IEnumerable<T>
     {
-        public readonly Link<T> Head;
+        public readonly ListNode<T> Head;
 
         public LinkedList(T inital = default)
         {
             Head = new(inital);
         }
 
-        public Link<T>? this[int Index]
+        public ListNode<T>? this[int index]
         {
             get
             {
-                if (Index < 0) throw new IndexOutOfRangeException("Index must be greater than or equal to 0.");
-                Link<T> Current = Head;
-                for (int i = 0; i < Index + 1; i++)
+                if (index < 0) throw new IndexOutOfRangeException("Index must be greater than or equal to 0.");
+                int i = 0;
+                for (ListNode<T>? Current = Head; Current is not null; Current = Current.Next)
                 {
-                    if (i == Index) return Current;
+                   if (i == index) return Current;
                 }
                 return null;
             }
-            set
-            {
-
-            }
         }
 
-        public IEnumerator<T> GetEnumerator()
+        public IEnumerator<ListNode<T>> GetEnumerator()
         {
-            for (Link<T>? Current = Head; Current is not null; Current = Current.Next)
+            for (ListNode<T>? Current = Head; Current is not null; Current = Current.Next)
             {
-                yield return Current.Value;
+                yield return Current;
             }
             
         }
@@ -50,12 +46,12 @@ namespace LinkedList
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 
-    public class Link<T>
+    public class ListNode<T>
     {
         public T Value;
-        public Link<T>? Next;
+        public ListNode<T>? Next;
 
-        public Link(T inital)
+        public ListNode(T inital)
         {
             Value = inital;
         }
