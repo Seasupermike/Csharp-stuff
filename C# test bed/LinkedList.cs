@@ -7,11 +7,11 @@ namespace LinkedList
     {
         public static void Test()
         {
-            
+
         }
     }
 
-    public class LinkedList<T> : IEnumerable<T>
+    public class LinkedList<T> : IEnumerable<ListNode<T>>
     {
         public readonly ListNode<T> Head;
 

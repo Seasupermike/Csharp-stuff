@@ -252,12 +252,14 @@ namespace Catalog
             
         }
 
+        /// <summary>Gets random item in Catalog</summary>
         public T GetRandom()
         {
             if (Count == 0) throw new InvalidOperationException($"Catalog<{typeof(T)}> contains no elements.");
             return Items[Random.Shared.Next(Count)];
         }
 
+        /// <summary>Returns a represation of the Catalog</summary>
         public override string ToString()
         {
             if (Count == 0) return $"Catalog<{typeof(T)}>(0)";
