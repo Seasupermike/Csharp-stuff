@@ -1,20 +1,19 @@
 ﻿using System.Collections;
 using System.Data;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
-using System.Diagnostics;
 
-namespace Catalog
+namespace Collections
 {
     public class TestClass
     {
         public static void Test()
         {
-            Catalog<int> c = new Catalog<int>() { 1, 2, 3 };
-            int[] l = c.ToArray();
+           
         }
     }
 
-    public interface ICatalog<T> : IEnumerable<T>, ICollection<T>
+    public interface ICatalog<T> : ICollection<T>, IList<T>
     {
         int Capacity { get; }
         void AddRange(IEnumerable<T> Values);
@@ -27,18 +26,11 @@ namespace Catalog
         public void EnsureMinimumCapacity(int NeededCapacity);
     }
 
-    public class Catalog<T> : ICatalog<T>, IList<T>
+    public class Catalog<T> : ICatalog<T>
     {
         private T[] Items;
         public int Capacity => Items.Length;
-        public int Count
-        {
-            get;
-            private set
-            {
-                field = value;
-            }
-        }
+        public int Count { get; set; }
         public bool IsReadOnly { get; }
 
         public Catalog(int Capacity = 0, bool IsReadOnly = false)
@@ -52,18 +44,23 @@ namespace Catalog
             if (Collection.TryGetNonEnumeratedCount(out int count))
             {
                 Items = new T[count];
-            }
-            else
+                int i = 0;
+                foreach (T item in Collection)
+                {
+                    Items[i] = item;
+                    i++;
+                }
+            } else
             {
-                Items = new T[Collection.Count()];
+                Items = new T[1];
+                int i = 0;
+                foreach (T item in Collection)
+                {
+                    EnsureMinimumCapacity(i + 1);
+                    Items[i] = item;
+                    i++;
+                }
             }
-            int i = 0;
-            foreach (T Item in Collection)
-            {
-                Items[i] = Item;
-                i++;
-            }
-            Count = i;
             this.IsReadOnly = IsReadOnly;
         }
 
@@ -245,11 +242,12 @@ namespace Catalog
             try
             {
                 Items.CopyTo(DestinationArray, StartingIndex);
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
                 throw e;
             }
-            
+
         }
 
         /// <summary>Gets random item in Catalog</summary>
@@ -275,7 +273,8 @@ namespace Catalog
                         if (item is null)
                         {
                             sb.Append($"null");
-                        } else
+                        }
+                        else
                         {
                             sb.Append($"\"{item}\"");
                         }
@@ -294,11 +293,12 @@ namespace Catalog
                         if (item is null)
                         {
                             sb.Append($"null");
-                        } else
+                        }
+                        else
                         {
                             sb.Append($"'{Items[i]}'");
                         }
-                            
+
                         if (i < Count - 1)
                         {
                             sb.Append(", ");
@@ -320,7 +320,7 @@ namespace Catalog
                         }
 
                         string type = item!.GetType().ToString();
-                        
+
 
                         if (type == "System.String")
                         {
@@ -348,7 +348,8 @@ namespace Catalog
                         if (Items[i] is null)
                         {
                             sb.Append("null");
-                        } else
+                        }
+                        else
                         {
                             sb.Append(Items[i]!.ToString());
                         }
@@ -373,10 +374,7 @@ namespace Catalog
 
         public IEnumerator<T> GetEnumerator()
         {
-            for (int i = 0; i < Count; i++)
-            {
-                yield return Items[i];
-            }
+            foreach (T item in Items) yield return item;
         }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
@@ -392,6 +390,138 @@ namespace Catalog
                 }
             }
             return true;
+        }
+    }
+
+    public class Selection<T> : IEnumerable<T> where T : class
+    {
+        private T[] _Items;
+        private Dictionary<Type, int> _ItemsLocation;
+        public int Count { get; private set; }
+
+        public int Current
+        {
+            get;
+            set
+            {
+                if (value < 0) throw new IndexOutOfRangeException("Index must be greater than or equal to 0.");
+                if (value >= Count) throw new IndexOutOfRangeException("Index must be less than Count.");
+                field = value;
+            }
+        }
+        public T Selected => _Items[Current];
+
+        public Selection(int Capacity = 0)
+        {
+            Capacity = Capacity < 0 ? 0 : Capacity;
+            _Items = new T[Capacity];
+            _ItemsLocation = new(Capacity);
+
+        }
+
+        public T this[int Index]
+        {
+            get
+            {
+                if (Index < 0) throw new IndexOutOfRangeException("Index must be greater than or equal to 0.");
+                if (Index >= Count) throw new IndexOutOfRangeException("Index must be less than Count.");
+                return _Items[Index];
+            }
+            set
+            {
+                if (Index < 0) throw new IndexOutOfRangeException("Index must be greater than or equal to 0.");
+                if (Index >= Count) throw new IndexOutOfRangeException("Index must be less than Count.");
+                _Items[Index] = value;
+                _ItemsLocation[value.GetType()] = Index;
+            }
+        }
+
+        public bool TryAdd(T item)
+        {
+            if (_ItemsLocation.ContainsKey(item.GetType())) return false;
+            _ItemsLocation.Add(item.GetType(), Count);
+            if (Count + 1 >= _Items.Length)
+            {
+                Array.Resize(ref _Items, (Count + 1) * 2);
+            }
+            _Items[Count] = item;
+            Count++;
+            return true;
+        }
+
+        public void SetCurrentToRandom()
+        {
+            Current = Random.Shared.Next(0, Count);
+        }
+
+        public IEnumerator<T> GetEnumerator()
+        {
+            foreach (T item in _Items) yield return item;
+        }
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+    }
+
+    public class LinkedList<T> : IEnumerable<ListNode<T>>
+    {
+        public readonly ListNode<T> Head;
+
+        public LinkedList(T inital = default)
+        {
+            Head = new(inital);
+        }
+
+        public ListNode<T>? this[int index]
+        {
+            get
+            {
+                if (index < 0) throw new IndexOutOfRangeException("Index must be greater than or equal to 0.");
+                int i = 0;
+                for (ListNode<T>? Current = Head; Current is not null; Current = Current.Next)
+                {
+                    if (i == index) return Current;
+                }
+                return null;
+            }
+        }
+
+        public IEnumerator<ListNode<T>> GetEnumerator()
+        {
+            for (ListNode<T>? Current = Head; Current is not null; Current = Current.Next)
+            {
+                yield return Current;
+            }
+
+        }
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+    }
+
+    public class ListNode<T>
+    {
+        public T Value;
+        public ListNode<T>? Next;
+
+        public ListNode()
+        {
+            Value = default;
+        }
+
+        public ListNode(T inital)
+        {
+            Value = inital;
+        }
+
+        public ListNode(ListNode<T> node)
+        {
+            Value = default;
+            Next = node;
+        }
+
+        public ListNode(T inital, ListNode<T> node)
+        {
+            Value = inital;
+            Next = node;
         }
     }
 }

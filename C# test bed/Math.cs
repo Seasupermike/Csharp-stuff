@@ -6,13 +6,12 @@ public class Math
 	{
 		public static void Test()
 		{
-            double[] nums = [ -1273, 2, -143, 0, 1213.78, 1, 534];
+            byte[] nums = [ 255, 2, 143, 0, 218, 1, 234];
             foreach (double num in nums)
             {
                 Console.WriteLine($"{num}: {IsEven<double>(num)}");
                 
             }
-
             ToNumber<float>(1);
         }
     }

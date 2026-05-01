@@ -1,24 +1,20 @@
-﻿using System.Runtime.CompilerServices;
-using System.Security.Cryptography.X509Certificates;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-
-namespace Result
+﻿namespace Result
 {
 	public class TestClass
 	{
         public static void Test()
         {
-            //Result<float, FormatException> result  
+            
         }
 
     }
 
 	public class Result<TReturn, TError> where TError : Exception
 	{
-		public TReturn? Value;
+		public TReturn Value;
         public readonly TError? Error;
 
-        private Result(TReturn? value, TError? error)
+        private Result(TReturn value, TError? error)
 		{
 			Value = value;
 			Error = error;
@@ -33,13 +29,13 @@ namespace Result
 			return this;
 		}
 
-		public TReturn? TryGetResult()
+		public TReturn TryGetResult()
 		{
-            if (Error is null)
+            if (Error is not null)
             {
-                return Value;
+                throw Error;
             }
-            throw Error;
+            return Value;
         }
 
         public static Result<TReturn, TError> Pass(TReturn value)
@@ -61,6 +57,11 @@ namespace Result
             {
                 return Result<TReturn, TError>.Fail(error);
             }
+        }
+
+        public static Result<TReturn, TError> CallbackToResult(Func<Result<TReturn, TError>> callback)
+        {
+            return callback();
         }
     }
 }

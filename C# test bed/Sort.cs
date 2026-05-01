@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Numerics;
-using Catalog;
+using Collections;
 
 namespace Sort
 {
@@ -35,5 +35,14 @@ namespace Sort
                 if (!changed) return;
             }
 		}
-	}
+
+        public static void ConformSort(int[] nums)
+        {
+            for (int i = 0; i < nums.Length; i++)
+            {
+                nums[i] = i;
+            }
+        }
+
+    }
 }
